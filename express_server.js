@@ -23,6 +23,13 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new",(req, res) => {
   res.render("urls_new");
 })
+app.post("/urls/:shortURL/delete", (req,res) => {
+  delete urlDatabase[req.params.shortURL];
+  let templateVars = { urls: urlDatabase };
+  res.redirect("/urls");
+ // res.render("urls_index", templateVars);
+
+})
 app.post("/urls", (req, res) => {
   // console.log(req.body.longURL);
   // res.send("OK");
