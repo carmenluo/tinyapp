@@ -1,7 +1,9 @@
 const express = require('express');
 const bodyParser = require("body-parser");
+var cookieParser = require('cookie-parser');
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 const PORT = 8080;
 app.set('view engine', 'ejs');
 function generateRandomString() {
@@ -16,13 +18,33 @@ app.get("/", (req, res) => {
   res.send('Hello');
 });
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = {};
+  console.log(req.cookies["username"]);
+  if (req.cookies["username"]) {
+    templateVars = {
+      urls: urlDatabase,
+      username: req.cookies["username"]
+    }
+  } else {
+    templateVars = {
+      urls: urlDatabase
+    }
+  }
   res.render("urls_index", templateVars);
+});
+app.post("/login", (req, res) => {
+  console.log(req.body.username);
+  res.cookie("username", req.body.username);
+  res.redirect("/urls");
+});
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect("/urls");
 });
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 })
-app.post("/urls/:shortURL",(req, res) => {
+app.post("/urls/:shortURL", (req, res) => {
   console.log(req.body);
   urlDatabase[req.params.shortURL] = req.body.longURL;
   res.redirect("/urls");
