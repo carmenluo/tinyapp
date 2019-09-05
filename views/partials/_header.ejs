@@ -9,18 +9,23 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <%if (typeof username == 'undefined') { %>
-        <form class="form-inline" action="/login" method="POST">
-          <input class="form-control" type="text" name="username" placeholder="User Name">
-          <button class="btn btn-primary btn-md" type="submit">Submit</button>
-        </form>
-        <% } else{ %>  
-        <form lass="form-inline" action="/logout" method="POST">
-          <p class="nav-item nav-link" align="right">Welcome to use TinyApp: <%=username%></p>
-          <button class="btn btn-primary btn-md" type="submit">Logout</button>
-        </form>
-        <% } %>
       </div>
+    </div>
+    <div class="navbar-nav navbar-rigth">
+      <%if (typeof useremail == 'undefined') { %>
+      <form class="form-inline" action="/login" method="GET">
+        <button class="btn btn-primary btn-md" type="submit">Login</button>
+      </form>
+      <form action = "/register" method = "GET">
+        <button class="btn btn-danger btn-md" style = "margin-left: 5px" type="submit">Register</button>
+      </form>
+      <% } else{ %>
+      <form class="form-inline" action="/logout" method="POST">
+          <label class="nav-item nav-link">Welcome to use TinyApp: <%=useremail%></label>
+          <button class="btn btn-primary btn-md" type="submit">Logout</button>
+      </form>
+
+      <% } %>
     </div>
   </nav>
 </header>
