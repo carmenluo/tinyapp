@@ -32,7 +32,7 @@
           <td><%= url %></td>
           <td><%= urls[url].longURL %></td>
           <td>
-            <form class="form-inline" action="/urls/<%=url%>/delete" method="POST">
+            <form class="form-inline" action="/urls/<%=url%>?_method=DELETE" method="POST">
               <button class="btn btn-danger btn-md" type='submit'>Delete</button>
             </form>
           </td>

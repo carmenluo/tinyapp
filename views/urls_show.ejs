@@ -22,7 +22,7 @@
     <div class="card-header">EDIT</div>
     <div class="card-body text-center">
       <div class="text-center">
-        <form class="justify-content-center" action="/urls/<%= shortURL %>" method="POST">
+        <form class="justify-content-center" action="/urls/<%= shortURL %>?_method=PUT" method="POST">
           <div class="form-group">
             <label for="longURL" class="col-form-label">Update URL </label>
             <input class="form-control" type="text" name="longURL" placeholder="New Long URL"

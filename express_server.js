@@ -1,4 +1,5 @@
 const express = require('express');
+const methodOverride = require('method-override');
 const bodyParser = require("body-parser");
 const { getUserByEmail, emailLookup, checkCookies, generateRandomString } = require('./helpers');
 const cookieSession = require('cookie-session');
@@ -9,6 +10,7 @@ app.use(cookieSession({
   name: 'userId',
   keys: ['id']
 }));
+app.use(methodOverride('_method'));
 const PORT = 8080;
 app.set('view engine', 'ejs');
 const urlDatabase = {
@@ -106,7 +108,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-app.post("/urls/:shortURL", (req, res) => {
+app.put("/urls/:shortURL", (req, res) => {
   urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
 });
@@ -116,7 +118,7 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
