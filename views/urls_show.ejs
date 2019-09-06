@@ -14,7 +14,8 @@
     <div class="card-header"></div>
     <div class="card-body">
       <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-      <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+      <p class="card-text">Short URL: <a href="/u/<%= shortURL %>" onclick="location.reload()"><%= shortURL %></a></p>
+      <p class="card-text">Visited: <%= visited %></p>
     </div>
   </div>
 

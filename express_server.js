@@ -14,8 +14,8 @@ app.use(methodOverride('_method'));
 const PORT = 8080;
 app.set('view engine', 'ejs');
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aa" }
+  b6UTxQ: { longURL: "https://www.tsn.ca", visited: "0", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", visited: "0", userID: "aa" }
 };
 const users = {
   "aJ48lW": {
@@ -41,7 +41,7 @@ app.get("/urls", (req, res) => {
 });
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = { "longURL": req.body.longURL, userID: req.session.userId };
+  urlDatabase[shortURL] = { "longURL": req.body.longURL, userID: req.session.userId, "visited": 0 };
   res.redirect(`/urls/${shortURL}`);
 });
 //Register
@@ -114,7 +114,10 @@ app.put("/urls/:shortURL", (req, res) => {
 });
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  let templateVars = { shortURL: shortURL, longURL: urlDatabase[shortURL].longURL, useremail: emailLookup(req.session.userId, users)};
+  let templateVars = {
+    shortURL: shortURL, longURL: urlDatabase[shortURL].longURL,
+    visited: urlDatabase[shortURL].visited, useremail: emailLookup(req.session.userId, users)
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -125,6 +128,7 @@ app.delete("/urls/:shortURL", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
+  urlDatabase[req.params.shortURL].visited = parseInt(urlDatabase[req.params.shortURL].visited) + 1;
   res.redirect(longURL);
 });
 // app.post
