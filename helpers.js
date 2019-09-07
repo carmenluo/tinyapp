@@ -41,4 +41,18 @@ const urlsForUser = function(id, urlDatabase) {
   }
   return userURl;
 };
-module.exports = { emailLookup, getUserByEmail, checkCookies, generateRandomString, urlsForUser};
+//check longURL exist or not in urlDatabase
+const longURLExist = function (longURL, urlDatabase) {
+  for (let url in urlDatabase) {
+    if (longURL === urlDatabase[url].longURL) {
+      return true;
+    }
+  }
+  return false;
+};
+module.exports = { emailLookup, 
+                  getUserByEmail, 
+                  checkCookies, 
+                  generateRandomString, 
+                  urlsForUser, 
+                  longURLExist};
