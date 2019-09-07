@@ -41,4 +41,4 @@ const urlsForUser = function(id, urlDatabase) {
   }
   return userURl;
 };
-module.exports = { emailLookup, getUserByEmail, checkCookies, generateRandomString };
+module.exports = { emailLookup, getUserByEmail, checkCookies, generateRandomString, urlsForUser};

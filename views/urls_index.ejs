@@ -13,7 +13,7 @@
 <body>
   <% include partials/_header %>
   <main style="margin: 1em;">
-    <%if (typeof useremail == 'undefined') { %>
+    <%if (typeof useremail === 'undefined') { %>
     <h3>Please Login first</h3>
     <% } else { %>
     <h3>My URLs</h3>

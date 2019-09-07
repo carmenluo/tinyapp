@@ -1,7 +1,7 @@
 const express = require('express');
 const methodOverride = require('method-override');
 const bodyParser = require("body-parser");
-const { getUserByEmail, emailLookup, checkCookies, generateRandomString } = require('./helpers');
+const { getUserByEmail, emailLookup, checkCookies, generateRandomString, urlsForUser } = require('./helpers');
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcrypt");
 const app = express();
@@ -40,9 +40,16 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 app.post("/urls", (req, res) => {
-  let shortURL = generateRandomString();
-  urlDatabase[shortURL] = { "longURL": req.body.longURL, userID: req.session.userId, "visited": 0 };
-  res.redirect(`/urls/${shortURL}`);
+  if (longURLExist(req.body.longURL, urlsForUser(req.session.userId, urlDatabase))) {
+    res.statusCode = 403;
+    let error = { "statusCode": res.statusCode, "message": `This long URL exists already` };
+    let templateVars = { useremail: emailLookup(req.session.userId, users), error }
+    res.render("urls_new", templateVars);
+  } else {
+    let shortURL = generateRandomString();
+    urlDatabase[shortURL] = { "longURL": req.body.longURL, userID: req.session.userId, "visited": 0 };
+    res.redirect(`/urls/${shortURL}`);
+  }
 });
 //Register
 app.get("/register", (req, res) => {
@@ -107,18 +114,60 @@ app.get("/urls/new", (req, res) => {
   }
   res.render("urls_new", templateVars);
 });
-
+//when update long URL that is existed already, let user know it and don't update it
 app.put("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-  res.redirect("/urls");
+  if (longURLExist(req.body.longURL, urlsForUser(req.session.userId, urlDatabase))) {
+    res.statusCode = 403;
+    let error = { "statusCode": res.statusCode, "message": `This long URL exists already` };
+    let shortURL = req.params.shortURL;
+    let templateVars = {
+      shortURL: shortURL, longURL: urlDatabase[shortURL].longURL,
+      visited: urlDatabase[shortURL].visited, useremail: emailLookup(req.session.userId, users), error
+    }
+    res.render("urls_show", templateVars);
+  } else {
+    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+    res.redirect("/urls");
+  }
 });
+//check longURL exist or not in urlDatabase
+const longURLExist = function (longURL, urlDatabase) {
+  for (let url in urlDatabase) {
+    if (longURL === urlDatabase[url].longURL) {
+      return true;
+    }
+  }
+  return false;
+};
+/*
+1.If user not login, ask user to log in first
+2.If short url not exist, 404
+3.Check if the shortURL belong to this user first, otherwise show error message page
+4.show edit page
+*/
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  let templateVars = {
-    shortURL: shortURL, longURL: urlDatabase[shortURL].longURL,
-    visited: urlDatabase[shortURL].visited, useremail: emailLookup(req.session.userId, users)
+  if (!req.session.userId) {
+    res.redirect("/urls");
   };
-  res.render("urls_show", templateVars);
+  if (!Object.keys(urlDatabase).includes(shortURL)) {
+    res.statusCode = 404;
+    let error = { "statusCode": res.statusCode, "message": `This short URL ${shortURL} does not exists. Please go back` };
+    const templateVars = { useremail: emailLookup(req.session.userId, users), error };
+    res.render("error", templateVars);
+  }
+  if (req.session.userId !== urlDatabase[shortURL].userID) {
+    res.statusCode = 403;
+    let error = { "statusCode": res.statusCode, "message": `You are not allowed to access this shortURL. Please go back` };
+    const templateVars = { useremail: emailLookup(req.session.userId, users), error };
+    res.render("error", templateVars);
+  } else {
+    let templateVars = {
+      shortURL: shortURL, longURL: urlDatabase[shortURL].longURL,
+      visited: urlDatabase[shortURL].visited, useremail: emailLookup(req.session.userId, users)
+    };
+    res.render("urls_show", templateVars);
+  }
 });
 
 app.delete("/urls/:shortURL", (req, res) => {
@@ -130,10 +179,6 @@ app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   urlDatabase[req.params.shortURL].visited = parseInt(urlDatabase[req.params.shortURL].visited) + 1;
   res.redirect(longURL);
-});
-// app.post
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
 });
 app.listen(PORT, () => {
   console.log(`Expample app listening on port ${PORT}!`);
