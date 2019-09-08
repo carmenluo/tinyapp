@@ -13,26 +13,8 @@ app.use(cookieSession({
 app.use(methodOverride('_method'));
 const PORT = 8080;
 app.set('view engine', 'ejs');
-const urlDatabase = {
-
-};
-const users = {
-  // "aJ48lW": {
-  //   id: "aJ48lW",
-  //   email: "user@ee.com",
-  //   password: bcrypt.hashSync("12345", 10)
-  // },
-  // "aa": {
-  //   id: "aa",
-  //   email: "user2@ee.com",
-  //   password: "aa"
-  // },
-  // "userRandomID": {
-  //   id: "userRandomID",
-  //   email: "user@example.com",
-  //   password: "purple-monkey-dinosaur"
-  // }
-};
+const urlDatabase = {};
+const users = {};
 //display all the urls belong to this user
 app.get("/urls", (req, res) => {
   let templateVars = checkCookies(req, urlDatabase, users);
